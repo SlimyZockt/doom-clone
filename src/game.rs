@@ -8,13 +8,13 @@ enum GameState {
     GameOver,
 }
 
-struct Game {
-    entities: vec<&mut impl Entity>
+struct Game<T: Entity> {
+    entities: Vec<T>
 }
 //TODO: implement functions
-impl Game {
+impl<T: Entity> Game<T> {
     fn start() {}
-    fn add_entity(entity: Entity) {}
+    fn add_entity(entity: impl Entity) {}
     fn remove_entity(i: usize) {}
     fn pause() {}
 }
