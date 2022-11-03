@@ -1,82 +1,56 @@
-pub mod drawing_utils;
+pub mod entity;
 pub mod player;
-
-use bevy::{
-    log::info,
-    prelude::*,
-    time::FixedTimestep,
-    window::{CreateWindow, WindowId},
-};
+pub mod game;
 
 use color_eyre::Result;
 
-use drawing_utils::draw_rect;
+use entity::Entity;
 use player::*;
+use raylib::prelude::Color as RColor;
+use raylib::prelude::*;
 
+const MAP: &[&[i32; 6]; 6] = &[
+    &[1, 1, 1, 1, 1, 1],
+    &[1, 0, 0, 0, 0, 1],
+    &[1, 0, 1, 1, 0, 1],
+    &[1, 0, 0, 0, 0, 1],
+    &[1, 0, 0, 0, 0, 1],
+    &[1, 1, 1, 1, 1, 1],
+];
 
-
-fn main() -> Result<()> {
-    App::new()
-        .init_resource::<Game>()
-        .add_state(GameState::Playing)
-        .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
-        .add_system_set(SystemSet::on_update(GameState::Playing).with_system(Player::movement))
-        .add_system(bevy::window::close_on_esc)
-        .run();
-
-    Ok(())
+fn main() {
+    // let opt:  = None;
+    let mut player = Player::default();
+    game(&mut [&mut player]);
 }
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum GameState {
-    Playing,
-    GameOver,
-}
+fn game(entities: &mut [&mut impl Entity]) {
+    let (mut rl, thread) = raylib::init().size(640, 480).title("Doom Cone").build();
 
-#[derive(Default)]
-pub struct Game {
-    player: Player,
-}
-
-fn setup(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut create_window_events: EventWriter<CreateWindow>,
-    mut game: ResMut<Game>
-) {
-    commands.spawn_bundle(Camera2dBundle::default());
-
-    let window_id = WindowId::new();
-
-    // sends out a "CreateWindow" event, which will be received by the windowing backend
-    let map: &[&[i32]] = &[
-        &[1, 1, 1, 1, 1, 1],
-        &[1, 0, 0, 0, 0, 1],
-        &[1, 0, 1, 1, 0, 1],
-        &[1, 0, 0, 0, 0, 1],
-        &[1, 0, 0, 0, 0, 1],
-        &[1, 1, 1, 1, 1, 1],
-    ];
-
-    let draw_map = |map: &[&[i32]], commands: &mut Commands| -> Result<()> {
-        map.iter().enumerate().for_each(|(y, row)| {
-            row.iter().enumerate().for_each(|(x, key)| {
-                if key == &1 {
-                    let offset = [x as f32 * 32.0, y as f32 * 32.0];
-                    commands.spawn_bundle(draw_rect(
-                        Vec2::new(32.0, 32.0),
-                        Vec2::from_array(offset),
-                        Color::WHITE,
-                    ));
-                }
-            })
+    while !rl.window_should_close() {
+        entities.iter_mut().for_each(|val|{
+            val.update(rl.get_frame_time(), &rl);
         });
 
-        Ok(())
-    };
+        let mut d = rl.begin_drawing(&thread);
+        draw_map::<6>(&mut d, MAP);
+        d.clear_background(RColor::GRAY);
 
-    let _ = draw_map(map, &mut commands);
+        entities.iter().for_each(|val| {
+            val.draw(&mut d);
+        });
+    }
 
-    game.player.new(&mut commands);
+}
+
+
+fn draw_map<const T: usize>(draw_handler: &mut RaylibDrawHandle, map: &[&'static [i32; T]; T]) {
+    map.iter().enumerate().for_each(|(y, row)| {
+        row.iter().enumerate().for_each(|(x, key)| {
+            if key == &1 {
+                let offset = [x as i32 * 32, y as i32 * 32];
+                draw_handler.draw_rectangle(offset[0], offset[1], 32, 32, RColor::WHITE);
+            }
+        });
+    });
 }
