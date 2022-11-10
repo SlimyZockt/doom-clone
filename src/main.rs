@@ -1,6 +1,6 @@
 pub mod entity;
 pub mod player;
-
+mod utils;
 
 
 use entity::Entity;
