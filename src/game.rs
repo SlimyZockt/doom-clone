@@ -8,7 +8,7 @@ enum GameState {
     GameOver,
 }
 
-struct Game<T: Entity> {
+pub struct Game<T: Entity> {
     entities: Vec<T>
 }
 //TODO: implement functions

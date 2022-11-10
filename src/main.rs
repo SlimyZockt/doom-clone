@@ -1,8 +1,7 @@
 pub mod entity;
 pub mod player;
-pub mod game;
 
-use color_eyre::Result;
+
 
 use entity::Entity;
 use player::*;
@@ -26,6 +25,10 @@ fn main() {
 
 fn game(entities: &mut [&mut impl Entity]) {
     let (mut rl, thread) = raylib::init().size(640, 480).title("Doom Cone").build();
+
+        entities.iter_mut().for_each(|val|{
+            val.ready();
+        });
 
     while !rl.window_should_close() {
         entities.iter_mut().for_each(|val|{
