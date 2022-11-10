@@ -63,12 +63,12 @@ impl Entity for Player {
 
     fn draw(&self, d: &mut RaylibDrawHandle) {
 
-        d.draw_rectangle((self.x) as i32, (self.y) as i32, 16, 16, Color::YELLOW);
+        d.draw_rectangle((self.x) as i32, (self.y) as i32, 4, 4, Color::YELLOW);
 
         //TODO: Calc pos from angle
-        let end_pos_x = (self.x + 8. + 30.0 * self.rotation.cos()) as i32;
-        let end_pos_y = (self.y + 8. + 30.0 * self.rotation.sin()) as i32;
+        let end_pos_x = (self.x + 2. + 10.0 * self.rotation.cos()) as i32;
+        let end_pos_y = (self.y + 2. + 10.0 * self.rotation.sin()) as i32;
 
-        d.draw_line((self.x + 8.) as i32, (self.y + 8.) as i32, end_pos_x, end_pos_y, Color::YELLOW);
+        d.draw_line((self.x + 2.) as i32, (self.y + 2.) as i32, end_pos_x, end_pos_y, Color::YELLOW);
     }
 }
