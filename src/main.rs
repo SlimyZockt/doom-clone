@@ -7,8 +7,10 @@ use entity::Entity;
 use player::*;
 use raylib::prelude::Color as RColor;
 use raylib::prelude::*;
+use tracing_subscriber::FmtSubscriber;
+use tracing::{info, error, Level};
 
-const MAP: &[&[i32; 6]; 6] = &[
+pub const MAP: &[&[i32; 6]; 6] = &[
     &[1, 1, 1, 1, 1, 1],
     &[1, 0, 0, 0, 0, 1],
     &[1, 0, 1, 1, 0, 1],
@@ -19,8 +21,13 @@ const MAP: &[&[i32; 6]; 6] = &[
 
 fn main() {
     // let opt:  = None;
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::TRACE)
+        .finish();
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
     let mut player = Player::default();
     game(&mut [&mut player]);
+    info!("game started");
 }
 
 fn game(entities: &mut [&mut impl Entity]) {
@@ -32,7 +39,7 @@ fn game(entities: &mut [&mut impl Entity]) {
 
     while !rl.window_should_close() {
         entities.iter_mut().for_each(|val|{
-            val.update(rl.get_frame_time(), &rl);
+            val.update(&rl.get_frame_time(), &rl);
         });
 
         let mut d = rl.begin_drawing(&thread);
@@ -57,3 +64,5 @@ fn draw_map<const T: usize>(draw_handler: &mut RaylibDrawHandle, map: &[&'static
         });
     });
 }
+
+
