@@ -1,23 +1,16 @@
 pub mod entity;
 pub mod player;
 mod utils;
+mod world;
 
 
 use entity::Entity;
 use player::*;
-use raylib::prelude::Color as RColor;
 use raylib::prelude::*;
 use tracing_subscriber::FmtSubscriber;
 use tracing::{info, error, Level};
 
-pub const MAP: &[&[i32; 6]; 6] = &[
-    &[1, 1, 1, 1, 1, 1],
-    &[1, 0, 0, 0, 0, 1],
-    &[1, 0, 1, 1, 0, 1],
-    &[1, 0, 0, 0, 0, 1],
-    &[1, 0, 0, 0, 0, 1],
-    &[1, 1, 1, 1, 1, 1],
-];
+
 
 fn main() {
     // let opt:  = None;
@@ -43,8 +36,8 @@ fn game(entities: &mut [&mut impl Entity]) {
         });
 
         let mut d = rl.begin_drawing(&thread);
-        draw_map::<6>(&mut d, MAP);
-        d.clear_background(RColor::GRAY);
+        world::draw_map(&mut d, &world::get_map());
+        d.clear_background(Color::GRAY);
 
         entities.iter().for_each(|val| {
             val.draw(&mut d);
@@ -54,15 +47,6 @@ fn game(entities: &mut [&mut impl Entity]) {
 }
 
 
-fn draw_map<const T: usize>(draw_handler: &mut RaylibDrawHandle, map: &[&'static [i32; T]; T]) {
-    map.iter().enumerate().for_each(|(y, row)| {
-        row.iter().enumerate().for_each(|(x, key)| {
-            if key == &1 {
-                let offset = [x as i32 * 32, y as i32 * 32];
-                draw_handler.draw_rectangle(offset[0], offset[1], 32, 32, RColor::WHITE);
-            }
-        });
-    });
-}
+
 
 
