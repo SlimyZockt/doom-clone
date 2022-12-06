@@ -10,15 +10,17 @@
             "name": "Debug executable 'doom-clone'",
             "cargo": {
                 "args": [
-                    "b",
+                    "build",
                     "--bin=doom-clone",
                     "--package=doom-clone"
                 ],
-                "problemMatcher": "clippy",
+                "filter": {
+                    "name": "doom-clone",
+                    "kind": "bin"
+                }
             },
             "args": [],
-            "cwd": "${workspaceFolder}",
-            "terminal": "external",
+            "cwd": "${workspaceFolder}"
         },
         {
             "type": "lldb",
@@ -35,9 +37,6 @@
                     "name": "doom-clone",
                     "kind": "bin"
                 }
-            },
-            "env": {
-                "RUST_LOG": "debug"
             },
             "args": [],
             "cwd": "${workspaceFolder}"
